@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://YOUR_GITHUB_USERNAME.github.io/tic-tac-toe",
+  "homepage": "https://illuusi0.github.io/tic-tac-toe",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
