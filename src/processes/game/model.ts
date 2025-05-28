@@ -1,12 +1,12 @@
-import { GameHistory } from '@/features/game-board/model/types';
+import { GameHistory, GameMove, CellValue, WinnerType } from '@/features/game-board/model/types';
 import { saveGameToStorage } from '@/shared/lib/storage';
 
 export const createGameHistory = (
   playerX: string,
   playerO: string,
-  winner: 'X' | 'O' | 'draw',
-  moves: any[],
-  grid: any[][],
+  winner: WinnerType,
+  moves: GameMove[],
+  grid: CellValue[][],
   gridSize: number
 ): GameHistory => {
   return {

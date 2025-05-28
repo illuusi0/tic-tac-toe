@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '@/app/providers/store';
-import { RootState } from '@/app/providers/store';
+import { useAppDispatch } from '@/app/providers/store';
 import { clearHistory } from '../../model/historySlice';
 import { getLocalHistory } from '@/shared/lib/storage';
 import { 

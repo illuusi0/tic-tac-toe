@@ -1,54 +1,32 @@
-# React + TypeScript + Vite
+# Крестики-нолики 5 в ряд (React + TypeScript + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Тестовое задание для React-разработчика
 
-Currently, two official plugins are available:
+**Версия:** 1.0  
+**Цель:** Демонстрация навыков работы с React, управления состоянием и создания интерактивного UI.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📌 Функционал
 
-## Expanding the ESLint configuration
+### 🔐 Страница авторизации
+- Ввод имен двух игроков
+- Валидация имен перед началом игры
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 🎮 Игровое поле
+- **Бесконечная сетка** (до `Number.MAX_SAFE_INTEGER`)
+- Поочередные ходы (X и O)
+- **Автоматическое определение победы** при 5 в ряд (горизонталь/вертикаль/диагональ)
+- Визуальное выделение победной комбинации
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### 📜 История матчей
+- Список всех сыгранных партий
+- Просмотр финального состояния поля
+- Даты и участники матчей
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠 Технологии
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- **React 18+** с хуками
+- **TypeScript**
+- **Vite** для сборки
+- **MUI** Material UI
+- **LocalStorage** (базовое хранилище)
+- **ESLint** с конфигурацией для TypeScript и React

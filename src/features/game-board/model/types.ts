@@ -1,5 +1,6 @@
 export type Player = 'X' | 'O';
 export type CellValue = 'X' | 'O' | null;
+export type WinnerType = CellValue | 'draw';
 
 export interface Position {
   row: number;
@@ -15,7 +16,7 @@ export interface GameMove {
 export interface GameState {
   grid: CellValue[][];
   currentPlayer: 'X' | 'O';
-  winner: CellValue;
+  winner: WinnerType;
   isGameOver: boolean;
   moves: GameMove[];
   gridSize: number;
@@ -31,7 +32,7 @@ export interface GameHistory {
   date: number;
   playerX: string;
   playerO: string;
-  winner: CellValue;
+  winner: WinnerType;
   moves: GameMove[];
   finalGrid: CellValue[][];
   gridSize: number;

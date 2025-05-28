@@ -1,8 +1,10 @@
+import { CellValue } from '@/features/game-board/model/types';
+
 export const checkWinner = (
-  grid: any[][],
+  grid: CellValue[][],
   row: number,
   col: number,
-  player: any,
+  player: CellValue,
   winLength: number
 ): boolean => {
   const directions = [

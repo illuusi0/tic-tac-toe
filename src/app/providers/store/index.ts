@@ -3,9 +3,6 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import gameReducer from '@/features/game-board/model/gameSlice';
 import authReducer from '@/features/auth/model/authSlice';
 import historyReducer from '@/features/game-history/model/historySlice';
-import { GameState } from '@/features/game-board/model/types';
-import { HistoryState } from '@/features/game-board/model/types';
-import { AuthState } from '@/features/auth/model/types';
 
 export interface RootState {
   game: ReturnType<typeof gameReducer>;
