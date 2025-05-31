@@ -54,7 +54,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   useEffect(() => {
     if (!isHistorical && isGameOver && winner && playerX && playerO) {
-      saveGameResult(playerX, playerO, winner, currentGrid, currentGridSize);
+      saveGameResult(playerX, playerO, winner, currentGrid, currentGridSize, [], null);
     }
   }, [isGameOver, winner, playerX, playerO, currentGrid, currentGridSize, isHistorical]);
 

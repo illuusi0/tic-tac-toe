@@ -37,7 +37,7 @@ export interface GameHistory {
   moves: GameMove[];
   finalGrid: CellValue[][];
   gridSize: number;
-  winningLine: Position[] | null;
+  winningLine?: Position[] | null;
 }
 
 export interface HistoryState {
