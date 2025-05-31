@@ -46,7 +46,7 @@ const GameBoard: React.FC = () => {
 
   const renderCellContent = (value: CellValue) => {
     return (
-        <Typography variant="h5">{value}</Typography>
+        <Typography variant="h5" sx={{ margin: 0, padding: 0 }}>{value}</Typography>
     );
   };
 
@@ -63,7 +63,7 @@ const GameBoard: React.FC = () => {
         <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
           <Box sx={{ width: '100%', maxWidth: '500px', aspectRatio: '1 / 1', display: 'flex', flexDirection: 'column' }}>
             {grid.map((row: CellValue[], rowIndex: number) => (
-              <Box key={rowIndex} sx={{ display: 'flex', flexGrow: 1 }}>
+              <Box key={rowIndex} sx={{ display: 'flex', height: `${100 / gridSize}%` }}>
                 {row.map((cellValue: CellValue, colIndex: number) => (
                   <Box
                     key={`${rowIndex}-${colIndex}`}
@@ -82,7 +82,7 @@ const GameBoard: React.FC = () => {
                     }}
                     onClick={() => handleCellClick(rowIndex, colIndex)}
                   >
-                    <Paper elevation={3} sx={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Paper elevation={3} sx={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 0 }}>
                        {renderCellContent(cellValue)}
                     </Paper>
                   </Box>
