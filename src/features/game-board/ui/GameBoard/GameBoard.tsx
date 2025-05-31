@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/app/providers/store";
 import { RootState } from "@/app/providers/store";
 import { makeMove, resetGame, startNewGame } from "../../model/gameSlice";
-import { Box, Button, Container, Grid, Paper, Typography } from "@mui/material";
+import { Box, Button, Container, Paper, Typography } from "@mui/material";
 import { CellValue } from "../../model/types";
 import { saveGameResult } from "@/shared/lib/storage";
 
@@ -44,26 +44,9 @@ const GameBoard: React.FC = () => {
     return winner === "X" ? playerX : playerO;
   };
 
-  const renderCell = (row: number, col: number) => {
-    const value = grid[row][col];
+  const renderCellContent = (value: CellValue) => {
     return (
-      <Paper
-        elevation={3}
-        sx={{
-          width: 60,
-          height: 60,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          cursor: value ? "default" : "pointer",
-          "&:hover": {
-            backgroundColor: value ? "inherit" : "#f5f5f5",
-          },
-        }}
-        onClick={() => handleCellClick(row, col)}
-      >
         <Typography variant="h5">{value}</Typography>
-      </Paper>
     );
   };
 
@@ -77,24 +60,36 @@ const GameBoard: React.FC = () => {
               ? "Ничья!"
               : `Ходит: ${getCurrentPlayerName()} (${currentPlayer})`}
         </Typography>
-        <Box sx={{ mb: 3, overflowX: "auto" }}>
-          <Grid container spacing={1} justifyContent="center">
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ width: '100%', maxWidth: '500px', aspectRatio: '1 / 1', display: 'flex', flexDirection: 'column' }}>
             {grid.map((row: CellValue[], rowIndex: number) => (
-              <Grid
-                container
-                item
-                key={rowIndex}
-                spacing={1}
-                justifyContent="center"
-              >
-                {row.map((_: CellValue, colIndex: number) => (
-                  <Grid item key={`${rowIndex}-${colIndex}`}>
-                    {renderCell(rowIndex, colIndex)}
-                  </Grid>
+              <Box key={rowIndex} sx={{ display: 'flex', flexGrow: 1 }}>
+                {row.map((cellValue: CellValue, colIndex: number) => (
+                  <Box
+                    key={`${rowIndex}-${colIndex}`}
+                    sx={{
+                      width: `${100 / gridSize}%`,
+                      height: '100%',
+                      border: '1px solid #ccc', // Add border for visibility
+                      boxSizing: 'border-box', // Include border in element's total width and height
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      cursor: cellValue ? "default" : "pointer",
+                      "&:hover": {
+                        backgroundColor: cellValue ? "inherit" : "#f5f5f5",
+                      },
+                    }}
+                    onClick={() => handleCellClick(rowIndex, colIndex)}
+                  >
+                    <Paper elevation={3} sx={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                       {renderCellContent(cellValue)}
+                    </Paper>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </Box>
         <Button variant="contained" onClick={handleReset} sx={{ mt: 2 }}>
           Начать заново
