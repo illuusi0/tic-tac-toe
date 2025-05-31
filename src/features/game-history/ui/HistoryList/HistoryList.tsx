@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
-import { CellValue, Position, WinnerType, GameHistory as SimpleGameHistory } from '@/features/game-board/model/types';
+import { GameHistory as SimpleGameHistory } from '@/features/game-board/model/types';
 import GameBoard from '@/features/game-board/ui/GameBoard/GameBoard';
 
 const HistoryList: React.FC = () => {
@@ -61,11 +61,6 @@ const HistoryList: React.FC = () => {
     setShowClearConfirm(false);
   };
 
-  const isWinningCell = (row: number, col: number, winningLine: Position[] | null): boolean => {
-    if (!winningLine) return false;
-    return winningLine.some(cell => cell.row === row && cell.col === col);
-  };
-
   const renderGameBoard = (game: SimpleGameHistory) => {
     return (
       <GameBoard 
@@ -100,7 +95,6 @@ const HistoryList: React.FC = () => {
             localGames.map((game) => (
               <ListItem 
                 key={game.id}
-                button
                 onClick={() => handleGameClick(game)}
                 sx={{ 
                   border: 1, 
