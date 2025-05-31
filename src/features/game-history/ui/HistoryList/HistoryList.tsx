@@ -12,24 +12,15 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  Grid,
-  Paper,
   Button,
   DialogActions,
   IconButton,
   Tooltip
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-interface SimpleGameHistory {
-  id: string;
-  playerX: string;
-  playerO: string;
-  date: number;
-  winner: 'X' | 'O' | 'draw';
-  finalGrid: Array<Array<'X' | 'O' | null>>;
-  gridSize: number;
-}
+import CloseIcon from '@mui/icons-material/Close';
+import { CellValue, Position, WinnerType, GameHistory as SimpleGameHistory } from '@/features/game-board/model/types';
+import GameBoard from '@/features/game-board/ui/GameBoard/GameBoard';
 
 const HistoryList: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -70,30 +61,21 @@ const HistoryList: React.FC = () => {
     setShowClearConfirm(false);
   };
 
+  const isWinningCell = (row: number, col: number, winningLine: Position[] | null): boolean => {
+    if (!winningLine) return false;
+    return winningLine.some(cell => cell.row === row && cell.col === col);
+  };
+
   const renderGameBoard = (game: SimpleGameHistory) => {
     return (
-      <Grid container spacing={1} justifyContent="center">
-        {game.finalGrid.map((row, rowIndex) => (
-          <Grid container item key={rowIndex} spacing={1} justifyContent="center">
-            {row.map((cell, colIndex) => (
-              <Grid item key={`${rowIndex}-${colIndex}`}>
-                <Paper
-                  elevation={3}
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Typography variant="body1">{cell}</Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        ))}
-      </Grid>
+      <GameBoard 
+        initialGrid={game.finalGrid}
+        initialWinner={game.winner}
+        initialIsGameOver={true} // Historical games are always over
+        initialGridSize={game.gridSize}
+        initialWinningLine={game.winningLine}
+        isHistorical={true}
+      />
     );
   };
 
@@ -183,38 +165,38 @@ const HistoryList: React.FC = () => {
       <Dialog 
         open={!!selectedGame} 
         onClose={handleCloseDialog}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
       >
         {selectedGame && (
           <>
-            <DialogTitle>
+            <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               Детали игры
+              <IconButton edge="end" color="inherit" onClick={handleCloseDialog} aria-label="close">
+                <CloseIcon />
+              </IconButton>
             </DialogTitle>
-            <DialogContent>
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" gutterBottom>
-                  {selectedGame.playerX} (X) vs {selectedGame.playerO} (O)
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Дата: {new Date(selectedGame.date).toLocaleString()}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  {selectedGame.winner === 'draw'
-                    ? 'Ничья'
-                    : `Победитель: ${selectedGame.winner === 'X' ? selectedGame.playerX : selectedGame.playerO}`}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Размер поля: {selectedGame.gridSize}x{selectedGame.gridSize}
-                </Typography>
-              </Box>
-              <Box sx={{ overflowX: 'auto' }}>
-                {renderGameBoard(selectedGame)}
-              </Box>
-              <Box sx={{ mt: 2, textAlign: 'right' }}>
-                <Button onClick={handleCloseDialog}>
-                  Закрыть
-                </Button>
+            <DialogContent dividers>
+              <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
+                <Box sx={{ flexBasis: '50%', flexShrink: 0 }}>
+                  <Typography variant="h6" gutterBottom>
+                    {selectedGame.playerX} (X) vs {selectedGame.playerO} (O)
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    Дата: {new Date(selectedGame.date).toLocaleString()}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {selectedGame.winner === 'draw'
+                      ? 'Ничья'
+                      : `Победитель: ${selectedGame.winner === 'X' ? selectedGame.playerX : selectedGame.playerO}`}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    Размер поля: {selectedGame.gridSize}x{selectedGame.gridSize}
+                  </Typography>
+                </Box>
+                <Box sx={{ flexBasis: '50%', flexGrow: 1, overflowX: 'auto' }}>
+                  {renderGameBoard(selectedGame)}
+                </Box>
               </Box>
             </DialogContent>
           </>

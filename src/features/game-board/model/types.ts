@@ -20,6 +20,7 @@ export interface GameState {
   isGameOver: boolean;
   moves: GameMove[];
   gridSize: number;
+  winningLine: Position[] | null;
 }
 
 export interface MovePayload {
@@ -36,6 +37,7 @@ export interface GameHistory {
   moves: GameMove[];
   finalGrid: CellValue[][];
   gridSize: number;
+  winningLine: Position[] | null;
 }
 
 export interface HistoryState {

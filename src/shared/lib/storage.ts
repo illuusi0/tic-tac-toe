@@ -1,11 +1,15 @@
+import { CellValue, Position, WinnerType, GameMove } from '@/features/game-board/model/types';
+
 interface SimpleGameHistory {
   id: string;
   playerX: string;
   playerO: string;
   date: number;
-  winner: 'X' | 'O' | 'draw';
-  finalGrid: Array<Array<'X' | 'O' | null>>;
+  winner: WinnerType;
+  finalGrid: CellValue[][];
   gridSize: number;
+  winningLine: Position[] | null;
+  moves: GameMove[];
 }
 
 export const saveGameToStorage = (game: any) => {
@@ -18,9 +22,11 @@ export const saveGameToStorage = (game: any) => {
 export const saveGameResult = (
   playerX: string, 
   playerO: string, 
-  winner: 'X' | 'O' | 'draw',
-  grid: Array<Array<'X' | 'O' | null>>,
-  gridSize: number
+  winner: WinnerType,
+  grid: CellValue[][],
+  gridSize: number,
+  moves: GameMove[],
+  winningLine: Position[] | null
 ) => {
   const localHistory = localStorage.getItem('localHistory');
   const history: SimpleGameHistory[] = localHistory ? JSON.parse(localHistory) : [];
@@ -32,7 +38,9 @@ export const saveGameResult = (
     date: Date.now(),
     winner,
     finalGrid: grid,
-    gridSize
+    gridSize,
+    moves,
+    winningLine
   };
 
   history.push(gameResult);

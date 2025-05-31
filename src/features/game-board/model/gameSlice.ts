@@ -5,6 +5,7 @@ import {
   CellValue,
   GameMove,
   NewGamePayload,
+  Position,
 } from "./types";
 
 const createEmptyGrid = (size: number): CellValue[][] =>
@@ -19,13 +20,14 @@ const initialState: GameState = {
   isGameOver: false,
   moves: [],
   gridSize: 7,
+  winningLine: null,
 };
 
 const checkWinner = (
   grid: CellValue[][],
   lastRow: number,
   lastCol: number
-): CellValue => {
+): Position[] | null => {
   const player = grid[lastRow][lastCol];
   if (!player) return null;
 
@@ -36,45 +38,80 @@ const checkWinner = (
     [1, -1],
   ];
 
+  const winLength = 5; // Assuming 5 in a row to win
+
   for (const [dx, dy] of directions) {
-    let count = 1;
+    const line: Position[] = [];
+    let count = 0;
 
-    for (let i = 1; i < 5; i++) {
-      const newRow = lastRow + dx * i;
-      const newCol = lastCol + dy * i;
+    // Check in one direction
+    for (let i = -winLength + 1; i < winLength; i++) {
+      const r = lastRow + dx * i;
+      const c = lastCol + dy * i;
+
       if (
-        newRow < 0 ||
-        newRow >= grid.length ||
-        newCol < 0 ||
-        newCol >= grid[0].length ||
-        grid[newRow][newCol] !== player
+        r >= 0 &&
+        r < grid.length &&
+        c >= 0 &&
+        c < grid[0].length &&
+        grid[r][c] === player
       ) {
-        break;
+        line.push({ row: r, col: c });
+        count++;
+      } else {
+        // Reset line and count if the sequence is broken
+        // This logic needs to be adjusted to find a continuous line of winLength
+        // A better approach is to check from the last move outwards in each direction
+        // Let's refactor this part.
+        line.length = 0; // Clear the current line
+        count = 0;
       }
-      count++;
+
+       if (count >= winLength) {
+         return line.slice(line.length - winLength); // Return the winning segment
+       }
     }
 
-    for (let i = 1; i < 5; i++) {
-      const newRow = lastRow - dx * i;
-      const newCol = lastCol - dy * i;
-      if (
-        newRow < 0 ||
-        newRow >= grid.length ||
-        newCol < 0 ||
-        newCol >= grid[0].length ||
-        grid[newRow][newCol] !== player
-      ) {
-        break;
-      }
-      count++;
-    }
+     // The previous logic for checking in both directions and counting was flawed.
+     // Let's re-implement based on checking outwards from the last move.
 
-    if (count >= 5) {
-      return player;
-    }
+     let currentLine: Position[] = [];
+     // Check backwards from the last move
+     for(let i = 0; i < winLength; i++){
+       const r = lastRow - dx * i;
+       const c = lastCol - dy * i;
+       if(
+         r >= 0 && r < grid.length &&
+         c >= 0 && c < grid[0].length &&
+         grid[r][c] === player
+       ) {
+         currentLine.unshift({ row: r, col: c }); // Add to the beginning
+       } else {
+         break;
+       }
+     }
+
+     // Check forwards from the last move (excluding the last move itself as it's already added)
+     for(let i = 1; i < winLength; i++){
+        const r = lastRow + dx * i;
+        const c = lastCol + dy * i;
+        if(
+          r >= 0 && r < grid.length &&
+          c >= 0 && c < grid[0].length &&
+          grid[r][c] === player
+        ) {
+          currentLine.push({ row: r, col: c }); // Add to the end
+        } else {
+          break;
+        }
+     }
+
+     if(currentLine.length >= winLength) {
+       return currentLine; // Found a winning line
+     }
   }
 
-  return null;
+  return null; // No winner found
 };
 
 const gameSlice = createSlice({
@@ -88,6 +125,7 @@ const gameSlice = createSlice({
       state.isGameOver = false;
       state.moves = [];
       state.gridSize = action.payload.gridSize;
+      state.winningLine = null; // Reset winning line on new game
     },
     makeMove: (state, action: PayloadAction<MovePayload>) => {
       const { row, col } = action.payload;
@@ -102,13 +140,20 @@ const gameSlice = createSlice({
         };
         state.moves.push(move);
 
-        state.winner = checkWinner(state.grid, row, col);
+        const winningLine = checkWinner(state.grid, row, col);
+        if (winningLine) {
+          state.winner = state.currentPlayer;
+          state.isGameOver = true;
+          state.winningLine = winningLine; // Store the winning line
+        } else {
+             state.isGameOver =
+               state.grid.every((row) => row.every((cell) => cell !== null));
+        }
 
-        state.currentPlayer = state.currentPlayer === "X" ? "O" : "X";
+        if (!state.isGameOver) {
+             state.currentPlayer = state.currentPlayer === "X" ? "O" : "X";
+        }
 
-        state.isGameOver =
-          state.winner !== null ||
-          state.grid.every((row) => row.every((cell) => cell !== null));
       }
     },
     resetGame: (state) => {
@@ -117,6 +162,7 @@ const gameSlice = createSlice({
       state.winner = null;
       state.isGameOver = false;
       state.moves = [];
+      state.winningLine = null; // Reset winning line on reset
     },
   },
 });

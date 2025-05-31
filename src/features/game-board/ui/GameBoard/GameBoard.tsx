@@ -4,35 +4,70 @@ import { useAppDispatch, useAppSelector } from "@/app/providers/store";
 import { RootState } from "@/app/providers/store";
 import { makeMove, resetGame, startNewGame } from "../../model/gameSlice";
 import { Box, Button, Container, Paper, Typography } from "@mui/material";
-import { CellValue } from "../../model/types";
+import { CellValue, Position, WinnerType } from "../../model/types";
 import { saveGameResult } from "@/shared/lib/storage";
 
-const GameBoard: React.FC = () => {
+interface GameBoardProps {
+  initialGrid?: CellValue[][];
+  initialWinner?: WinnerType;
+  initialIsGameOver?: boolean;
+  initialGridSize?: number;
+  initialWinningLine?: Position[] | null;
+  isHistorical?: boolean; // Flag to indicate if rendering a historical game
+}
+
+const GameBoard: React.FC<GameBoardProps> = ({ 
+  initialGrid,
+  initialWinner,
+  initialIsGameOver,
+  initialGridSize,
+  initialWinningLine,
+  isHistorical = false,
+}) => {
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const { grid, currentPlayer, winner, isGameOver, gridSize } =
-    useAppSelector((state: RootState) => state.game);
+
+  // Use props if provided, otherwise use Redux state
+  const { 
+    grid: currentGrid,
+    currentPlayer,
+    winner: currentWinner,
+    isGameOver: currentIsGameOver,
+    gridSize: currentGridSize,
+    winningLine: currentWinningLine
+  } = useAppSelector((state: RootState) => state.game);
   const { playerX, playerO } = useAppSelector((state: RootState) => state.auth);
 
-  useEffect(() => {
-    const size = location.state?.gridSize || 7;
-    dispatch(startNewGame({ gridSize: size }));
-  }, [dispatch, location.state?.gridSize]);
+  const grid = isHistorical ? initialGrid! : currentGrid;
+  const winner = isHistorical ? initialWinner : currentWinner;
+  const isGameOver = isHistorical ? initialIsGameOver! : currentIsGameOver;
+  const gridSize = isHistorical ? initialGridSize! : currentGridSize;
+  const winningLine = isHistorical ? initialWinningLine : currentWinningLine;
+
 
   useEffect(() => {
-    if (isGameOver && winner && playerX && playerO) {
-      saveGameResult(playerX, playerO, winner, grid, gridSize);
+    if (!isHistorical) {
+      const size = location.state?.gridSize || 7;
+      dispatch(startNewGame({ gridSize: size }));
     }
-  }, [isGameOver, winner, playerX, playerO, grid, gridSize]);
+  }, [dispatch, location.state?.gridSize, isHistorical]);
+
+  useEffect(() => {
+    if (!isHistorical && isGameOver && winner && playerX && playerO) {
+      saveGameResult(playerX, playerO, winner, currentGrid, currentGridSize);
+    }
+  }, [isGameOver, winner, playerX, playerO, currentGrid, currentGridSize, isHistorical]);
 
   const handleCellClick = (row: number, col: number) => {
-    if (!winner && !isGameOver && grid[row][col] === null) {
+    if (!isHistorical && !isGameOver && grid[row][col] === null) {
       dispatch(makeMove({ row, col }));
     }
   };
 
   const handleReset = () => {
-    dispatch(resetGame());
+    if (!isHistorical) {
+       dispatch(resetGame());
+    }
   };
 
   const getCurrentPlayerName = () => {
@@ -50,16 +85,26 @@ const GameBoard: React.FC = () => {
     );
   };
 
+  const isWinningCell = (row: number, col: number): boolean => {
+    if (!winningLine) return false;
+    return winningLine.some(cell => cell.row === row && cell.col === col);
+  };
+
+  // Don't render the board if grid is not available (e.g., initial load)
+  if (!grid) return null;
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, textAlign: "center" }}>
-        <Typography variant="h4" gutterBottom>
-          {winner
-            ? `Победитель: ${getWinnerName()}`
-            : isGameOver
-              ? "Ничья!"
-              : `Ходит: ${getCurrentPlayerName()} (${currentPlayer})`}
-        </Typography>
+        {!isHistorical && ( // Only show game status for current game
+          <Typography variant="h4" gutterBottom>
+            {winner
+              ? `Победитель: ${getWinnerName()}`
+              : isGameOver
+                ? "Ничья!"
+                : `Ходит: ${getCurrentPlayerName()} (${currentPlayer})`}
+          </Typography>
+        )}
         <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
           <Box sx={{ width: '100%', maxWidth: '500px', aspectRatio: '1 / 1', display: 'flex', flexDirection: 'column' }}>
             {grid.map((row: CellValue[], rowIndex: number) => (
@@ -75,10 +120,11 @@ const GameBoard: React.FC = () => {
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      cursor: cellValue ? "default" : "pointer",
+                      cursor: !isHistorical && (!isGameOver && cellValue === null) ? "pointer" : "default",
                       "&:hover": {
-                        backgroundColor: cellValue ? "inherit" : "#f5f5f5",
+                        backgroundColor: !isHistorical && (!isGameOver && cellValue === null) ? "#f5f5f5" : "inherit",
                       },
+                      backgroundColor: isWinningCell(rowIndex, colIndex) ? 'lightgreen' : 'transparent',
                     }}
                     onClick={() => handleCellClick(rowIndex, colIndex)}
                   >
@@ -91,9 +137,11 @@ const GameBoard: React.FC = () => {
             ))}
           </Box>
         </Box>
-        <Button variant="contained" onClick={handleReset} sx={{ mt: 2 }}>
-          Начать заново
-        </Button>
+        {!isHistorical && ( // Only show reset button for current game
+          <Button variant="contained" onClick={handleReset} sx={{ mt: 2 }}>
+            Начать заново
+          </Button>
+        )}
       </Box>
     </Container>
   );
