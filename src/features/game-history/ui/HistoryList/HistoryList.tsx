@@ -66,7 +66,7 @@ const HistoryList: React.FC = () => {
       <GameBoard 
         initialGrid={game.finalGrid}
         initialWinner={game.winner}
-        initialIsGameOver={true} // Historical games are always over
+        initialIsGameOver={true}
         initialGridSize={game.gridSize}
         initialWinningLine={game.winningLine}
         isHistorical={true}

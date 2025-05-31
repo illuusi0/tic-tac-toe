@@ -13,7 +13,7 @@ interface GameBoardProps {
   initialIsGameOver?: boolean;
   initialGridSize?: number;
   initialWinningLine?: Position[] | null;
-  isHistorical?: boolean; // Flag to indicate if rendering a historical game
+  isHistorical?: boolean;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({ 
@@ -27,7 +27,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const dispatch = useAppDispatch();
   const location = useLocation();
 
-  // Use props if provided, otherwise use Redux state
   const { 
     grid: currentGrid,
     currentPlayer,
@@ -90,13 +89,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
     return winningLine.some(cell => cell.row === row && cell.col === col);
   };
 
-  // Don't render the board if grid is not available (e.g., initial load)
   if (!grid) return null;
 
   return (
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, textAlign: "center" }}>
-        {!isHistorical && ( // Only show game status for current game
+        {!isHistorical && (
           <Typography variant="h4" gutterBottom>
             {winner
               ? `Победитель: ${getWinnerName()}`
@@ -115,8 +113,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
                     sx={{
                       width: `${100 / gridSize}%`,
                       height: '100%',
-                      border: '1px solid #ccc', // Add border for visibility
-                      boxSizing: 'border-box', // Include border in element's total width and height
+                      border: '1px solid #ccc',
+                      boxSizing: 'border-box',
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
@@ -137,7 +135,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             ))}
           </Box>
         </Box>
-        {!isHistorical && ( // Only show reset button for current game
+        {!isHistorical && (
           <Button variant="contained" onClick={handleReset} sx={{ mt: 2 }}>
             Начать заново
           </Button>

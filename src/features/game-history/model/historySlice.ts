@@ -3,7 +3,6 @@ import { GameHistory, HistoryState } from '@/features/game-board/model/types';
 
 const STORAGE_KEY = 'localHistory';
 
-// Загрузка истории из localStorage
 const loadHistoryFromStorage = (): GameHistory[] => {
   try {
     const savedHistory = localStorage.getItem(STORAGE_KEY);
@@ -25,7 +24,6 @@ const historySlice = createSlice({
   reducers: {
     addGameToHistory: (state, action: PayloadAction<GameHistory>) => {
       state.games.unshift(action.payload);
-      // Сохраняем в localStorage
       try {
         const historyToSave = JSON.stringify(state.games);
         localStorage.setItem(STORAGE_KEY, historyToSave);
